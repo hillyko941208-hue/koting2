@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>大學生生存指南 - 30天校園生存挑戰</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+  <!-- Material Icons Round -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- 背景發光特效 -->
+  <div class="bg-glow circle-1"></div>
+  <div class="bg-glow circle-2"></div>
+ 
+  <!-- 主容器 -->
+  <div class="app-container">
+   
+    <!-- 音效與靜音按鈕 -->
+    <button id="sound-toggle" class="sound-btn" aria-label="切換音效">
+      <span class="material-icons-round">volume_up</span>
+    </button>
+
+
+    <!-- ================= START SCREEN ================= -->
+    <div id="start-screen" class="screen active-screen">
+      <div class="logo-area animate-float">
+        <span class="logo-icon material-icons-round">school</span>
+        <h1>大學生存指南</h1>
+        <p class="subtitle">30 Days Campus Survival Challenge</p>
+      </div>
+     
+      <div class="glass-panel start-card">
+        <h2>建立你的大學生檔案</h2>
+       
+        <div class="input-group">
+          <label for="player-name">學生姓名</label>
+          <input type="text" id="player-name" placeholder="請輸入姓名..." maxlength="8" value="小明">
+        </div>
+       
+        <div class="gender-select-container">
+          <label>選擇學生性別</label>
+          <div class="gender-grid">
+            <button class="gender-btn active" data-gender="male">
+              <span class="material-icons-round">man</span>
+              <span>男學生</span>
+            </button>
+            <button class="gender-btn" data-gender="female">
+              <span class="material-icons-round">woman</span>
+              <span>女學生</span>
+            </button>
+          </div>
+        </div>
+
+
+        <div class="avatar-select-container">
+          <label>選擇學生外觀 (精美向量插畫)</label>
+          <div class="avatar-grid">
+            <button class="avatar-option active" data-avatar="1">
+              <div class="svg-avatar-preview" id="avatar-preview-1"></div>
+            </button>
+            <button class="avatar-option" data-avatar="2">
+              <div class="svg-avatar-preview" id="avatar-preview-2"></div>
+            </button>
+            <button class="avatar-option" data-avatar="3">
+              <div class="svg-avatar-preview" id="avatar-preview-3"></div>
+            </button>
+          </div>
+        </div>
+       
+        <div class="trait-select-container">
+          <label>選擇性格天賦 (影響初始值)</label>
+          <div class="trait-grid">
+            <div class="trait-card active" data-trait="optimist">
+              <span class="material-icons-round">sentiment_very_satisfied</span>
+              <h3>樂天派</h3>
+              <p>初始心情 +20。笑看微積分，沒什麼大不了的！</p>
+            </div>
+            <div class="trait-card" data-trait="studious">
+              <span class="material-icons-round">history_edu</span>
+              <h3>勤奮型</h3>
+              <p>初始成績 +15。開局就是圖書館的常客！</p>
+            </div>
+            <div class="trait-card" data-trait="frugal">
+              <span class="material-icons-round">savings</span>
+              <h3>省錢達人</h3>
+              <p>初始金錢 +$2,000。打工是不可能少打的，記帳是本能！</p>
+            </div>
+            <div class="trait-card" data-trait="healthy">
+              <span class="material-icons-round">favorite</span>
+              <h3>健康寶寶</h3>
+              <p>初始體力 +20。跑三千公尺輕輕鬆鬆，熬夜本錢厚！</p>
+            </div>
+          </div>
+        </div>
+       
+        <button id="start-game-btn" class="btn btn-primary btn-large glow-btn">
+          <span>開啟大學生活</span>
+          <span class="material-icons-round">arrow_forward</span>
+        </button>
+      </div>
+    </div>
+
+
+    <!-- ================= GAME SCREEN ================= -->
+    <div id="game-screen" class="screen">
+      <!-- 頂部資訊列 -->
+      <header class="game-header glass-panel">
+        <div class="student-profile">
+          <div class="profile-avatar-container" id="display-avatar-container">
+            <!-- Dynamic SVG inserted here -->
+          </div>
+          <div class="profile-info">
+            <span id="display-name" class="student-name">大一新生</span>
+            <span id="display-trait" class="badge">樂天派</span>
+          </div>
+        </div>
+       
+        <div class="date-container">
+          <div class="date-header-row">
+            <div class="day-label">第 <span id="current-day">1</span> 天 / 30</div>
+            <div class="semester-stage" id="semester-text">期中考倒數 14 天</div>
+          </div>
+          <!-- 30天行事曆小工具 -->
+          <div class="calendar-widget" id="calendar-grid">
+            <!-- Grid of 30 dots/squares rendered by Javascript -->
+          </div>
+        </div>
+      </header>
+
+
+      <!-- 主要遊戲區域：網格佈局 -->
+      <main class="game-grid">
+       
+        <!-- 狀態面版 (Stats Panel) -->
+        <section class="stats-panel glass-panel">
+          <h3>個人狀態</h3>
+         
+          <div class="stat-item" id="stat-stamina">
+            <div class="stat-header">
+              <span class="stat-title"><span class="material-icons-round text-blue">bolt</span> 體力</span>
+              <span class="stat-value"><span id="val-stamina">100</span>/100</span>
+            </div>
+            <div class="stat-bar">
+              <div class="stat-fill bg-blue" id="fill-stamina" style="width: 100%;"></div>
+            </div>
+          </div>
+         
+          <div class="stat-item" id="stat-money">
+            <div class="stat-header">
+              <span class="stat-title"><span class="material-icons-round text-green">payments</span> 金錢</span>
+              <span class="stat-value">$<span id="val-money">13,000</span></span>
+            </div>
+            <div class="stat-bar">
+              <div class="stat-fill bg-green" id="fill-money" style="width: 100%;"></div>
+            </div>
+          </div>
+
+
+          <div class="stat-item" id="stat-satiety">
+            <div class="stat-header">
+              <span class="stat-title"><span class="material-icons-round" style="color: #b45309;">restaurant</span> 飽食度</span>
+              <span class="stat-value"><span id="val-satiety">100</span>/100</span>
+            </div>
+            <div class="stat-bar">
+              <div class="stat-fill" id="fill-satiety" style="width: 100%; background: linear-gradient(90deg, #d97706, #b45309); box-shadow: 0 0 8px rgba(180, 83, 9, 0.4);"></div>
+            </div>
+          </div>
+         
+          <div class="stat-item" id="stat-grades">
+            <div class="stat-header">
+              <span class="stat-title"><span class="material-icons-round text-orange">school</span> 成績</span>
+              <span class="stat-value"><span id="val-grades">50</span>/100</span>
+            </div>
+            <div class="stat-bar">
+              <div class="stat-fill bg-orange" id="fill-grades" style="width: 50%;"></div>
+            </div>
+          </div>
+         
+          <div class="stat-item" id="stat-mood">
+            <div class="stat-header">
+              <span class="stat-title"><span class="material-icons-round text-pink">favorite</span> 心情</span>
+              <span class="stat-value"><span id="val-mood">60</span>/100</span>
+            </div>
+            <div class="stat-bar">
+              <div class="stat-fill bg-pink" id="fill-mood" style="width: 60%;"></div>
+            </div>
+          </div>
+         
+          <div class="shop-buffs">
+            <h4>持有增益與衣裝</h4>
+            <div id="buffs-container" class="buffs-list">
+              <div class="no-buffs">無道具增益，快去商店逛逛！</div>
+            </div>
+          </div>
+         
+          <div class="shop-buffs" style="margin-top: 15px;">
+            <h4>隨身購物籃 (點擊食用補給)</h4>
+            <div id="basket-container" class="buffs-list basket-list" style="display: flex; flex-direction: column; gap: 8px; margin-top: 8px; max-height: 180px; overflow-y: auto;">
+              <div class="no-buffs">購物籃空空如也，快去買點東西吧！</div>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- 行動控制區 (Action Control Panel) -->
+        <section class="action-panel glass-panel">
+          <div class="section-header">
+            <h3>今日行動選擇</h3>
+            <span class="hint-text">選擇一項行動度過今天（每日固定開銷 -$300，飽食度 -20）</span>
+          </div>
+         
+          <div class="action-grid">
+            <button class="action-card" id="act-study">
+              <div class="action-icon bg-orange-light">
+                <span class="material-icons-round text-orange">menu_book</span>
+              </div>
+              <div class="action-details">
+                <h4>讀書學習</h4>
+                <p>回答 3 題跨領域學科題目，答對越多成績越高！</p>
+                <div class="action-changes">
+                  <span class="change-item neg"><span class="material-icons-round text-blue">bolt</span>預估 -10 ~ -20</span>
+                  <span class="change-item pos"><span class="material-icons-round text-orange">school</span>預估 0 ~ +15</span>
+                  <span class="change-item neg"><span class="material-icons-round text-pink">favorite</span>預估 -15 ~ +5</span>
+                  <span class="change-item neg"><span class="material-icons-round" style="color: #b45309;">restaurant</span>飽食度 -10</span>
+                  <span class="change-item neg"><span class="material-icons-round text-green">payments</span>預估 -$100</span>
+                </div>
+              </div>
+            </button>
+           
+            <button class="action-card" id="act-work">
+              <div class="action-icon bg-green-light">
+                <span class="material-icons-round text-green">storefront</span>
+              </div>
+              <div class="action-details">
+                <h4>打工賺錢</h4>
+                <p>到便利商店當大夜班，賺取生活費</p>
+                <div class="action-changes">
+                  <span class="change-item neg"><span class="material-icons-round text-blue">bolt</span>預估 -20</span>
+                  <span class="change-item pos"><span class="material-icons-round text-green">payments</span>預估 +$1,500</span>
+                  <span class="change-item neg"><span class="material-icons-round text-pink">favorite</span>預估 -10</span>
+                  <span class="change-item neg"><span class="material-icons-round" style="color: #b45309;">restaurant</span>飽食度 -15</span>
+                  <span class="change-item neg"><span class="material-icons-round text-orange">school</span>預估 -3</span>
+                </div>
+              </div>
+            </button>
+           
+            <button class="action-card" id="act-sleep">
+              <div class="action-icon bg-blue-light">
+                <span class="material-icons-round text-blue">bedtime</span>
+              </div>
+              <div class="action-details">
+                <h4>睡覺休息</h4>
+                <p>回宿舍睡到自然醒，徹底恢復體力</p>
+                <div class="action-changes">
+                  <span class="change-item pos"><span class="material-icons-round text-blue">bolt</span>預估 +30</span>
+                  <span class="change-item pos"><span class="material-icons-round text-pink">favorite</span>預估 +5</span>
+                  <span class="change-item neg"><span class="material-icons-round" style="color: #b45309;">restaurant</span>飽食度 -5</span>
+                  <span class="change-item neutral">不花錢</span>
+                </div>
+              </div>
+            </button>
+           
+            <button class="action-card" id="act-play">
+              <div class="action-icon bg-pink-light">
+                <span class="material-icons-round text-pink">sports_esports</span>
+              </div>
+              <div class="action-details">
+                <h4>休閒娛樂</h4>
+                <p>跟同學去 KTV 唱歌，回答歌詞接龍，答對越多心情加越多！</p>
+                <div class="action-changes">
+                  <span class="change-item neg"><span class="material-icons-round text-blue">bolt</span>預估 -10</span>
+                  <span class="change-item pos"><span class="material-icons-round text-pink">favorite</span>預估 -15 ~ +30</span>
+                  <span class="change-item neg"><span class="material-icons-round" style="color: #b45309;">restaurant</span>飽食度 -10</span>
+                  <span class="change-item neg"><span class="material-icons-round text-green">payments</span>預估 -$600</span>
+                  <span class="change-item neg"><span class="material-icons-round text-orange">school</span>預估 -5</span>
+                </div>
+              </div>
+            </button>
+
+
+            <button class="action-card" id="act-goshop">
+              <div class="action-icon bg-yellow-light">
+                <span class="material-icons-round text-yellow">local_mall</span>
+              </div>
+              <div class="action-details">
+                <h4>逛便利商店</h4>
+                <p>前往 7-11 或全家，購買美味鮮食與零食放入購物籃！</p>
+                <div class="action-changes">
+                  <span class="change-item neg"><span class="material-icons-round text-blue">bolt</span>預估 -3</span>
+                  <span class="change-item pos"><span class="material-icons-round text-pink">favorite</span>心情微幅增加</span>
+                  <span class="change-item pos"><span class="material-icons-round" style="color: #b45309;">restaurant</span>可儲存各類鮮食</span>
+                  <span class="change-item neg"><span class="material-icons-round text-green">payments</span>依購買品項付費</span>
+                </div>
+              </div>
+            </button>
+
+
+            <button class="action-card" id="act-goteashop">
+              <div class="action-icon bg-pink-light">
+                <span class="material-icons-round text-pink">local_cafe</span>
+              </div>
+              <div class="action-details">
+                <h4>買手搖飲料</h4>
+                <p>前往台式手搖飲料街，購買各品牌知名茶飲放入購物籃！</p>
+                <div class="action-changes">
+                  <span class="change-item neg"><span class="material-icons-round text-blue">bolt</span>預估 -3</span>
+                  <span class="change-item pos"><span class="material-icons-round text-pink">favorite</span>心情可大幅增加</span>
+                  <span class="change-item pos"><span class="material-icons-round" style="color: #b45309;">restaurant</span>可儲存各式手搖杯</span>
+                  <span class="change-item neg"><span class="material-icons-round text-green">payments</span>依購買品項付費</span>
+                </div>
+              </div>
+            </button>
+          </div>
+        </section>
+
+
+        <!-- 校園合作社 / 商店面版 (Campus Shop Panel) -->
+        <section class="shop-panel glass-panel">
+          <div class="section-header">
+            <h3>校園合作社</h3>
+            <!-- 分類頁籤 -->
+            <div class="shop-tabs">
+              <button class="shop-tab active" data-tab="items">被動增益</button>
+              <button class="shop-tab" data-tab="food">美味餐點</button>
+              <button class="shop-tab" data-tab="clothes">服裝更換</button>
+            </div>
+          </div>
+         
+          <div class="shop-grids-container">
+            <!-- Grid 1: Items -->
+            <div class="shop-grid active" id="shop-grid-items">
+              <!-- Item 1: Coffee -->
+              <div class="shop-card" data-item-id="coffee">
+                <div class="shop-item-info">
+                  <span class="material-icons-round shop-item-icon text-blue">local_cafe</span>
+                  <div>
+                    <h4>提神咖啡</h4>
+                    <p class="shop-item-desc">所有行動的體力消耗減少 3 點</p>
+                  </div>
+                </div>
+                <div class="shop-item-buy">
+                  <span class="shop-price">$300</span>
+                  <button class="btn btn-secondary btn-sm buy-btn" data-item-id="coffee">購買</button>
+                </div>
+              </div>
+             
+              <!-- Item 2: Textbook -->
+              <div class="shop-card" data-item-id="textbook">
+                <div class="shop-item-info">
+                  <span class="material-icons-round shop-item-icon text-orange">menu_book</span>
+                  <div>
+                    <h4>微積分聖經</h4>
+                    <p class="shop-item-desc">測驗完成後獲得的成績額外增加 4 點</p>
+                  </div>
+                </div>
+                <div class="shop-item-buy">
+                  <span class="shop-price">$1,200</span>
+                  <button class="btn btn-secondary btn-sm buy-btn" data-item-id="textbook">購買</button>
+                </div>
+              </div>
+             
+              <!-- Item 3: Chair -->
+              <div class="shop-card" data-item-id="chair">
+                <div class="shop-item-info">
+                  <span class="material-icons-round shop-item-icon text-pink">chair</span>
+                  <div>
+                    <h4>人體工學椅</h4>
+                    <p class="shop-item-desc">每次「睡覺休息」恢復的體力額外增加 10 點</p>
+                  </div>
+                </div>
+                <div class="shop-item-buy">
+                  <span class="shop-price">$2,000</span>
+                  <button class="btn btn-secondary btn-sm buy-btn" data-item-id="chair">購買</button>
+                </div>
+              </div>
+
+
+              <!-- Item 4: Lucky Cat -->
+              <div class="shop-card" data-item-id="luckycat">
+                <div class="shop-item-info">
+                  <span class="material-icons-round shop-item-icon text-green">savings</span>
+                  <div>
+                    <h4>招財貓擺飾</h4>
+                    <p class="shop-item-desc">每次「打工賺錢」的收入額外增加 $300</p>
+                  </div>
+                </div>
+                <div class="shop-item-buy">
+                  <span class="shop-price">$1,500</span>
+                  <button class="btn btn-secondary btn-sm buy-btn" data-item-id="luckycat">購買</button>
+                </div>
+              </div>
+
+
+              <!-- Item 5: Counseling (Consumable) -->
+              <div class="shop-card" data-item-id="counseling">
+                <div class="shop-item-info">
+                  <span class="material-icons-round shop-item-icon text-pink">spa</span>
+                  <div>
+                    <h4>心理諮商服務</h4>
+                    <p class="shop-item-desc">【單次使用】心情立即恢復 40 點</p>
+                  </div>
+                </div>
+                <div class="shop-item-buy">
+                  <span class="shop-price">$800</span>
+                  <button class="btn btn-secondary btn-sm buy-btn" data-item-id="counseling">購買</button>
+                </div>
+              </div>
+
+
+              <!-- Item 6: Soup (Consumable) -->
+              <div class="shop-card" data-item-id="soup">
+                <div class="shop-item-info">
+                  <span class="material-icons-round shop-item-icon text-blue">soup_kitchen</span>
+                  <div>
+                    <h4>阿嬤大補湯</h4>
+                    <p class="shop-item-desc">【單次使用】體力立即恢復 50 點</p>
+                  </div>
+                </div>
+                <div class="shop-item-buy">
+                  <span class="shop-price">$600</span>
+                  <button class="btn btn-secondary btn-sm buy-btn" data-item-id="soup">購買</button>
+                </div>
+              </div>
+            </div>
+
+
+            <!-- Grid 2: Food -->
+            <div class="shop-grid" id="shop-grid-food" style="display: none;">
+              <!-- Food 1: Riceball -->
+              <div class="shop-card" data-item-id="food_riceball">
+                <div class="shop-item-info">
+                  <span class="material-icons-round shop-item-icon text-yellow">lunch_dining</span>
+                  <div>
+                    <h4>超商三角御飯糰</h4>
+                    <p class="shop-item-desc">便宜又快速的選擇，飽食度 +20</p>
+                  </div>
+                </div>
+                <div class="shop-item-buy">
+                  <span class="shop-price">$45</span>
+                  <button class="btn btn-secondary btn-sm buy-btn" data-item-id="food_riceball">購買</button>
+                </div>
+              </div>
+             
+              <!-- Food 2: Bento -->
+              <div class="shop-card" data-item-id="food_bento">
+                <div class="shop-item-info">
+                  <span class="material-icons-round shop-item-icon text-orange">bento</span>
+                  <div>
+                    <h4>台鐵排骨便當</h4>
+                    <p class="shop-item-desc">經典美味，飽食度 +50，體力 +5</p>
+                  </div>
+                </div>
+                <div class="shop-item-buy">
+                  <span class="shop-price">$100</span>
+                  <button class="btn btn-secondary btn-sm buy-btn" data-item-id="food_bento">購買</button>
+                </div>
+              </div>
+
+
+              <!-- Food 3: Pizza -->
+              <div class="shop-card" data-item-id="food_pizza">
+                <div class="shop-item-info">
+                  <span class="material-icons-round shop-item-icon text-pink">local_pizza</span>
+                  <div>
+                    <h4>豪華芝心比薩</h4>
+                    <p class="shop-item-desc">分量十足，飽食度 +80，心情 +15</p>
+                  </div>
+                </div>
+                <div class="shop-item-buy">
+                  <span class="shop-price">$250</span>
+                  <button class="btn btn-secondary btn-sm buy-btn" data-item-id="food_pizza">購買</button>
+                </div>
+              </div>
+
+
+              <!-- Food 4: BBQ -->
+              <div class="shop-card" data-item-id="food_bbq">
+                <div class="shop-item-info">
+                  <span class="material-icons-round shop-item-icon text-green">outdoor_grill</span>
+                  <div>
+                    <h4>頂級和牛燒肉餐</h4>
+                    <p class="shop-item-desc">奢華饗宴！飽食度 +100，心情 +40，體力 +15</p>
+                  </div>
+                </div>
+                <div class="shop-item-buy">
+                  <span class="shop-price">$999</span>
+                  <button class="btn btn-secondary btn-sm buy-btn" data-item-id="food_bbq">購買</button>
+                </div>
+              </div>
+            </div>
+
+
+            <!-- Grid 3: Clothes -->
+            <div class="shop-grid" id="shop-grid-clothes" style="display: none;">
+              <!-- Cloth 0: Uniform (Default starting) -->
+              <div class="shop-card owned" data-item-id="cloth_uniform">
+                <div class="shop-item-info">
+                  <span class="material-icons-round shop-item-icon text-blue">checkroom</span>
+                  <div>
+                    <h4>校園經典制服</h4>
+                    <p class="shop-item-desc">普通制服，免費裝備，無額外效果</p>
+                  </div>
+                </div>
+                <div class="shop-item-buy">
+                  <span class="shop-price">免費</span>
+                  <button class="btn btn-secondary btn-sm equip-btn" data-item-id="cloth_uniform">穿著中</button>
+                </div>
+              </div>
+
+
+              <!-- Cloth 1: Hoodie -->
+              <div class="shop-card" data-item-id="cloth_hoodie">
+                <div class="shop-item-info">
+                  <span class="material-icons-round shop-item-icon text-pink">checkroom</span>
+                  <div>
+                    <h4>舒適純棉衛衣</h4>
+                    <p class="shop-item-desc">每次「睡覺休息」恢復的體力額外 +5</p>
+                  </div>
+                </div>
+                <div class="shop-item-buy">
+                  <span class="shop-price">$800</span>
+                  <button class="btn btn-secondary btn-sm buy-btn" data-item-id="cloth_hoodie">購買</button>
+                </div>
+              </div>
+
+
+              <!-- Cloth 2: Apron -->
+              <div class="shop-card" data-item-id="cloth_apron">
+                <div class="shop-item-info">
+                  <span class="material-icons-round shop-item-icon text-green">checkroom</span>
+                  <div>
+                    <h4>幸運打工圍裙</h4>
+                    <p class="shop-item-desc">每次「打工賺錢」獲得的薪水額外 +$200</p>
+                  </div>
+                </div>
+                <div class="shop-item-buy">
+                  <span class="shop-price">$2,000</span>
+                  <button class="btn btn-secondary btn-sm buy-btn" data-item-id="cloth_apron">購買</button>
+                </div>
+              </div>
+
+
+              <!-- Cloth 3: Gown -->
+              <div class="shop-card" data-item-id="cloth_gown">
+                <div class="shop-item-info">
+                  <span class="material-icons-round shop-item-icon text-orange">checkroom</span>
+                  <div>
+                    <h4>黃金學術袍</h4>
+                    <p class="shop-item-desc">測驗答對時獲得的成績額外 +3 點</p>
+                  </div>
+                </div>
+                <div class="shop-item-buy">
+                  <span class="shop-price">$3,000</span>
+                  <button class="btn btn-secondary btn-sm buy-btn" data-item-id="cloth_gown">購買</button>
+                </div>
+              </div>
+
+
+              <!-- Cloth 4: Jacket -->
+              <div class="shop-card" data-item-id="cloth_jacket">
+                <div class="shop-item-info">
+                  <span class="material-icons-round shop-item-icon text-yellow">checkroom</span>
+                  <div>
+                    <h4>潮牌防風夾克</h4>
+                    <p class="shop-item-desc">在「休閒娛樂」中獲得的心情額外 +10</p>
+                  </div>
+                </div>
+                <div class="shop-item-buy">
+                  <span class="shop-price">$4,500</span>
+                  <button class="btn btn-secondary btn-sm buy-btn" data-item-id="cloth_jacket">購買</button>
+                </div>
+              </div>
+
+
+              <!-- Cloth 5: Pajamas -->
+              <div class="shop-card" data-item-id="cloth_pajamas">
+                <div class="shop-item-info">
+                  <span class="material-icons-round shop-item-icon text-pink">checkroom</span>
+                  <div>
+                    <h4>超萌粉紅睡衣</h4>
+                    <p class="shop-item-desc font-accent">每次「睡覺休息」獲得的心情額外 +10 點</p>
+                  </div>
+                </div>
+                <div class="shop-item-buy">
+                  <span class="shop-price">$1,500</span>
+                  <button class="btn btn-secondary btn-sm buy-btn" data-item-id="cloth_pajamas">購買</button>
+                </div>
+              </div>
+
+
+              <!-- Cloth 6: Swimwear -->
+              <div class="shop-card" data-item-id="cloth_swim">
+                <div class="shop-item-info">
+                  <span class="material-icons-round shop-item-icon text-blue">checkroom</span>
+                  <div>
+                    <h4>夏日活力泳裝</h4>
+                    <p class="shop-item-desc font-accent">每次「休閒娛樂」恢復的體力額外 +5 點</p>
+                  </div>
+                </div>
+                <div class="shop-item-buy">
+                  <span class="shop-price">$2,500</span>
+                  <button class="btn btn-secondary btn-sm buy-btn" data-item-id="cloth_swim">購買</button>
+                </div>
+              </div>
+
+
+              <!-- Cloth 7: Biker Suit -->
+              <div class="shop-card" data-item-id="cloth_biker">
+                <div class="shop-item-info">
+                  <span class="material-icons-round shop-item-icon text-orange">checkroom</span>
+                  <div>
+                    <h4>機車皮質防摔服</h4>
+                    <p class="shop-item-desc font-accent">所有日常行動的飽食度消耗減少 2 點</p>
+                  </div>
+                </div>
+                <div class="shop-item-buy">
+                  <span class="shop-price">$5,000</span>
+                  <button class="btn btn-secondary btn-sm buy-btn" data-item-id="cloth_biker">購買</button>
+                </div>
+              </div>
+
+
+              <!-- Cloth 8: Detective -->
+              <div class="shop-card" data-item-id="cloth_detective">
+                <div class="shop-item-info">
+                  <span class="material-icons-round shop-item-icon text-orange">checkroom</span>
+                  <div>
+                    <h4>神探英倫風衣</h4>
+                    <p class="shop-item-desc font-accent">每次「讀書學習」的心情消耗減少 5 點</p>
+                  </div>
+                </div>
+                <div class="shop-item-buy">
+                  <span class="shop-price">$1,800</span>
+                  <button class="btn btn-secondary btn-sm buy-btn" data-item-id="cloth_detective">購買</button>
+                </div>
+              </div>
+
+
+              <!-- Cloth 9: Ninja -->
+              <div class="shop-card" data-item-id="cloth_ninja">
+                <div class="shop-item-info">
+                  <span class="material-icons-round shop-item-icon text-green">checkroom</span>
+                  <div>
+                    <h4>隱者暗夜忍服</h4>
+                    <p class="shop-item-desc font-accent">所有日常行動的體力消耗減少 2 點</p>
+                  </div>
+                </div>
+                <div class="shop-item-buy">
+                  <span class="shop-price">$3,500</span>
+                  <button class="btn btn-secondary btn-sm buy-btn" data-item-id="cloth_ninja">購買</button>
+                </div>
+              </div>
+
+
+              <!-- Cloth 10: Mafia -->
+              <div class="shop-card" data-item-id="cloth_mafia">
+                <div class="shop-item-info">
+                  <span class="material-icons-round shop-item-icon text-blue">checkroom</span>
+                  <div>
+                    <h4>紳士特務西裝</h4>
+                    <p class="shop-item-desc font-accent">每次「打工賺錢」收入額外 +$300</p>
+                  </div>
+                </div>
+                <div class="shop-item-buy">
+                  <span class="shop-price">$4,000</span>
+                  <button class="btn btn-secondary btn-sm buy-btn" data-item-id="cloth_mafia">購買</button>
+                </div>
+              </div>
+
+
+              <!-- Cloth 11: Cyberpunk -->
+              <div class="shop-card" data-item-id="cloth_cyber">
+                <div class="shop-item-info">
+                  <span class="material-icons-round shop-item-icon text-pink">checkroom</span>
+                  <div>
+                    <h4>賽博霓虹皮衣</h4>
+                    <p class="shop-item-desc font-accent">日常行動飽食度消耗 -3，唱歌娛樂心情額外 +5</p>
+                  </div>
+                </div>
+                <div class="shop-item-buy">
+                  <span class="shop-price">$6,000</span>
+                  <button class="btn btn-secondary btn-sm buy-btn" data-item-id="cloth_cyber">購買</button>
+                </div>
+              </div>
+
+
+              <!-- Cloth 12: Astronaut -->
+              <div class="shop-card" data-item-id="cloth_astronaut">
+                <div class="shop-item-info">
+                  <span class="material-icons-round shop-item-icon text-yellow">checkroom</span>
+                  <div>
+                    <h4>星際科幻航天服</h4>
+                    <p class="shop-item-desc font-accent">每日固定生活開銷減少 $100</p>
+                  </div>
+                </div>
+                <div class="shop-item-buy">
+                  <span class="shop-price">$8,000</span>
+                  <button class="btn btn-secondary btn-sm buy-btn" data-item-id="cloth_astronaut">購買</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- 每日生活日誌 (Daily Log Panel) -->
+        <section class="log-panel glass-panel">
+          <div class="section-header">
+            <h3>每日生活日誌</h3>
+            <button id="clear-logs" class="btn-clear" title="清空日誌">
+              <span class="material-icons-round">delete_sweep</span>
+            </button>
+          </div>
+          <div id="log-list" class="log-list">
+            <div class="log-item system">
+              <span class="log-time">Day 1</span>
+              <span class="log-text">大學生活開始了！請好好規劃時間，撐過30天，並且通過期中考與期末考！</span>
+            </div>
+          </div>
+        </section>
+
+
+      </main>
+    </div>
+
+
+    <!-- ================= DYNAMIC QUIZ MODAL ================= -->
+    <div id="quiz-modal" class="modal-overlay">
+      <div class="modal-content glass-panel animate-scale">
+        <div class="modal-header">
+          <div class="modal-header-title">
+            <span class="material-icons-round text-orange animate-pulse">menu_book</span>
+            <h2>今日隨堂測驗</h2>
+          </div>
+          <span id="quiz-progress" class="quiz-badge">第 1 / 3 題</span>
+        </div>
+        <div class="modal-body">
+          <div class="quiz-subject" id="quiz-subject">科目：數學</div>
+          <p id="quiz-question" class="quiz-question-text">題目載入中...</p>
+          <div id="quiz-explanation-box" class="quiz-explanation-box" style="display: none; margin-top: 15px; padding: 12px 16px; border-radius: 12px; background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.2); color: var(--text-main); font-size: 0.9rem; line-height: 1.5;"></div>
+        </div>
+        <div class="modal-actions" id="quiz-options">
+          <!-- Options buttons dynamically populated -->
+        </div>
+        <div id="quiz-next-container" style="padding: 0 24px 20px 24px; display: none;">
+          <button id="quiz-next-btn" class="btn btn-primary" style="width: 100%; justify-content: center;">
+            <span>下一題</span>
+            <span class="material-icons-round">arrow_forward</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ================= KTV LYRIC CHALLENGE MODAL ================= -->
+    <div id="ktv-modal" class="modal-overlay">
+      <div class="modal-content glass-panel animate-scale">
+        <div class="modal-header">
+          <div class="modal-header-title">
+            <span class="material-icons-round text-pink animate-pulse">music_note</span>
+            <h2>KTV 猜歌詞挑戰</h2>
+          </div>
+          <span id="ktv-progress" class="quiz-badge" style="background: var(--color-pink-bg); border-color: var(--color-pink); color: var(--color-pink);">第 1 / 3 題</span>
+        </div>
+        <div class="modal-body">
+          <div class="quiz-subject" id="ktv-song" style="border-left-color: var(--color-pink); color: var(--color-pink);">歌曲：周杰倫《晴天》</div>
+          <p id="ktv-lyric" class="quiz-question-text" style="font-style: italic;">「故事的小黃花，從出生那年就飄著...」</p>
+          <p class="quiz-hint" style="font-size: 0.85rem; color: var(--text-muted); margin-top: 10px;">請接下句歌詞：</p>
+        </div>
+        <div class="modal-actions" id="ktv-options">
+          <!-- Options buttons dynamically populated -->
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ================= RANDOM EVENT MODAL ================= -->
+    <div id="event-modal" class="modal-overlay">
+      <div class="modal-content glass-panel animate-scale">
+        <div class="modal-header">
+          <div class="modal-header-title">
+            <span id="event-icon" class="material-icons-round text-yellow animate-pulse">event_note</span>
+            <h2 id="event-title">校園突發事件</h2>
+          </div>
+        </div>
+        <div class="modal-body">
+          <p id="event-description">事件敘述載入中...</p>
+        </div>
+        <div class="modal-actions" id="event-choices">
+          <!-- Dynamically filled -->
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ================= CONVENIENCE STORE SHOPPING MODAL ================= -->
+    <div id="convenience-modal" class="modal-overlay">
+      <div class="modal-content glass-panel animate-scale store-711" id="convenience-content" style="max-width: 680px; width: 100%;">
+        <div class="store-banner" id="store-banner" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--store-border, var(--color-orange)); padding-bottom: 12px; margin-bottom: 16px;">
+          <div class="store-logo-area" style="display: flex; align-items: center; gap: 10px;">
+            <span class="material-icons-round store-logo-icon" style="font-size: 2.2rem; color: var(--store-primary, var(--color-orange));">storefront</span>
+            <h2 id="store-title" style="font-size: 1.35rem; color: white;">7-ELEVEN 便利商店</h2>
+          </div>
+          <div class="store-switcher" style="display: flex; gap: 8px; background: rgba(0,0,0,0.3); padding: 4px; border-radius: 20px;">
+            <button class="store-switch-btn active" id="btn-switch-711" data-store="711" style="background: var(--color-orange); color: white; border: none; padding: 6px 16px; border-radius: 15px; font-weight: bold; cursor: pointer; transition: all 0.2s;">7-11</button>
+            <button class="store-switch-btn" id="btn-switch-fm" data-store="familymart" style="background: transparent; color: var(--text-muted); border: none; padding: 6px 16px; border-radius: 15px; font-weight: bold; cursor: pointer; transition: all 0.2s;">全家</button>
+          </div>
+        </div>
+       
+        <div class="modal-body store-body" style="padding: 0;">
+          <!-- Mini stats inside store -->
+          <div class="store-mini-stats" style="display: flex; gap: 15px; background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 10px 16px; border-radius: 12px; margin-bottom: 16px; font-size: 0.9rem; font-weight: 600;">
+            <div class="mini-stat" style="display: flex; align-items: center; gap: 5px;">
+              <span class="material-icons-round text-green">payments</span>
+              <span>$<span id="store-val-money">0</span></span>
+            </div>
+            <div class="mini-stat" style="display: flex; align-items: center; gap: 5px;">
+              <span class="material-icons-round text-pink">favorite</span>
+              <span>心情 <span id="store-val-mood">0</span>/100</span>
+            </div>
+            <div class="mini-stat" style="display: flex; align-items: center; gap: 5px;">
+              <span class="material-icons-round text-yellow" id="store-basket-icon">shopping_basket</span>
+              <span>購物籃 <span id="store-val-basket-count" style="color: var(--color-yellow);">0</span> 件</span>
+            </div>
+          </div>
+         
+          <div class="store-shelf-container" style="max-height: 320px; overflow-y: auto; padding-right: 5px;">
+            <div class="convenience-shelf" id="store-shelf" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+              <!-- Dynamically populated products -->
+            </div>
+          </div>
+        </div>
+       
+        <div class="modal-footer store-footer" style="margin-top: 20px; border-top: 1px solid var(--glass-border); padding-top: 15px;">
+          <button class="btn btn-secondary" id="leave-store-btn" style="width: 100%; justify-content: center; font-weight: bold;">
+            <span class="material-icons-round">logout</span>
+            <span>離開便利商店 (前進下一天)</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ================= BUBBLE TEA SHOP MODAL ================= -->
+    <div id="teashop-modal" class="modal-overlay">
+      <div class="modal-content glass-panel animate-scale store-teashop" style="max-width: 680px; width: 100%; border-color: var(--color-pink);">
+        <div class="store-banner" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--color-pink); padding-bottom: 12px; margin-bottom: 16px;">
+          <div class="store-logo-area" style="display: flex; align-items: center; gap: 10px;">
+            <span class="material-icons-round store-logo-icon" style="font-size: 2.2rem; color: var(--color-pink);">local_cafe</span>
+            <h2 style="font-size: 1.35rem; color: white;">台式手搖飲料街</h2>
+          </div>
+          <div style="background: rgba(236, 72, 153, 0.15); border: 1px solid var(--color-pink); padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; color: var(--color-pink);">台灣在地手搖連鎖</div>
+        </div>
+       
+        <div class="modal-body store-body" style="padding: 0;">
+          <!-- Mini stats inside store -->
+          <div class="store-mini-stats" style="display: flex; gap: 15px; background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 10px 16px; border-radius: 12px; margin-bottom: 16px; font-size: 0.9rem; font-weight: 600;">
+            <div class="mini-stat" style="display: flex; align-items: center; gap: 5px;">
+              <span class="material-icons-round text-green">payments</span>
+              <span>$<span id="teashop-val-money">0</span></span>
+            </div>
+            <div class="mini-stat" style="display: flex; align-items: center; gap: 5px;">
+              <span class="material-icons-round text-pink">favorite</span>
+              <span>心情 <span id="teashop-val-mood">0</span>/100</span>
+            </div>
+            <div class="mini-stat" style="display: flex; align-items: center; gap: 5px;">
+              <span class="material-icons-round text-yellow" id="teashop-basket-icon">shopping_basket</span>
+              <span>購物籃 <span id="teashop-val-basket-count" style="color: var(--color-yellow);">0</span> 件</span>
+            </div>
+          </div>
+         
+          <div class="store-shelf-container" style="max-height: 320px; overflow-y: auto; padding-right: 5px;">
+            <div class="convenience-shelf" id="teashop-shelf" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+              <!-- Dynamically populated bubble tea drinks -->
+            </div>
+          </div>
+        </div>
+       
+        <div class="modal-footer store-footer" style="margin-top: 20px; border-top: 1px solid var(--glass-border); padding-top: 15px;">
+          <button class="btn btn-secondary" id="leave-teashop-btn" style="width: 100%; justify-content: center; font-weight: bold; border-color: rgba(236, 72, 153, 0.4);">
+            <span class="material-icons-round">logout</span>
+            <span>結帳離店 (前進下一天)</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ================= FULLSCREEN CENTERED EATING POPUP MODAL ================= -->
+    <div id="eating-modal" class="modal-overlay" style="display: none; align-items: center; justify-content: center; z-index: 2000; background: rgba(0, 0, 0, 0.75);">
+      <div class="modal-content glass-panel animate-scale eating-content" style="text-align: center; max-width: 360px; width: 90%; padding: 30px; border-color: var(--color-pink); box-shadow: 0 0 30px rgba(236, 72, 153, 0.3);">
+        <h2 style="font-size: 1.35rem; color: var(--color-pink); margin-bottom: 15px; text-shadow: 0 0 10px var(--color-pink-glow);" id="eating-item-title">正在享用...</h2>
+        <div class="eating-avatar-container" id="eating-avatar-container" style="width: 160px; height: 160px; margin: 0 auto 20px; position: relative;">
+          <!-- Large Avatar SVG goes here -->
+        </div>
+        <div class="eating-status-bubble" id="eating-status-bubble" style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border); border-radius: 12px; padding: 10px 14px; font-weight: bold; color: var(--text-main); font-size: 0.95rem; line-height: 1.4;">
+          <!-- Satiety +20, Mood +10 -->
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ================= WORK SCENARIO MODAL ================= -->
+    <div id="work-scenario-modal" class="modal-overlay">
+      <div class="modal-content glass-panel animate-scale" style="max-width: 560px; width: 100%;">
+        <div class="modal-header" style="border-bottom: 2px solid var(--color-green); padding-bottom: 12px;">
+          <div class="modal-header-title">
+            <span class="material-icons-round text-green animate-pulse" style="font-size: 1.8rem;">storefront</span>
+            <h2 style="font-size: 1.35rem; color: white;">超商大夜班打工事件</h2>
+          </div>
+        </div>
+        <div class="modal-body">
+          <div class="quiz-subject" style="border-left-color: var(--color-green); color: var(--color-green); margin-bottom: 15px;">地點：超商收銀台</div>
+          <p id="work-scenario-desc" class="quiz-question-text" style="font-size: 1.05rem; line-height: 1.6; margin-bottom: 20px; color: var(--text-main);">事件描述載入中...</p>
+        </div>
+        <div class="modal-actions" id="work-scenario-choices" style="display: flex; flex-direction: column; gap: 12px;">
+          <!-- Dynamically populated options buttons -->
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ================= ENDING SCREEN ================= -->
+    <div id="ending-screen" class="screen">
+      <div class="logo-area animate-float">
+        <span id="ending-icon" class="logo-icon material-icons-round text-gold">workspace_premium</span>
+        <h1 id="ending-title">挑戰結束</h1>
+        <p class="subtitle" id="ending-subtitle">30天校園生存挑戰評鑑結果</p>
+      </div>
+     
+      <div class="ending-grid">
+        <!-- Ending Card -->
+        <div class="glass-panel ending-card">
+          <h2 id="ending-name">學霸總裁</h2>
+          <div class="ending-badge" id="ending-rank">S 級評定</div>
+          <p id="ending-description">恭喜你！在30天內不僅學業頂尖，更是累積了驚人的財富，成為學校的傳奇人物！</p>
+         
+          <div class="ending-stats-summary">
+            <h3>最終結算屬性</h3>
+            <div class="ending-stats-grid">
+              <div class="ending-stat-item">
+                <span class="stat-label">體力</span>
+                <span id="end-stamina" class="stat-val text-blue">100</span>
+              </div>
+              <div class="ending-stat-item">
+                <span class="stat-label">金錢</span>
+                <span id="end-money" class="stat-val text-green">$15,000</span>
+              </div>
+              <div class="ending-stat-item">
+                <span class="stat-label">成績</span>
+                <span id="end-grades" class="stat-val text-orange">95</span>
+              </div>
+              <div class="ending-stat-item">
+                <span class="stat-label">心情</span>
+                <span id="end-mood" class="stat-val text-pink">80</span>
+              </div>
+            </div>
+          </div>
+         
+          <button id="restart-game-btn" class="btn btn-primary btn-large glow-btn">
+            <span class="material-icons-round">replay</span>
+            <span>重新挑戰</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <script src="script.js"></script>
+</body>
+</html>
+
+
+
+
